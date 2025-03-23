@@ -1,16 +1,27 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const router = express.Router();
 const port = 3000;
+require('dotenv').config();
 
-app.use(express.urlencoded({ extended: true })) // Acceder a urlencoded
-app.use(express.json())
+// Middleware para parsear JSON y URL-encoded bodies
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-router.get('/test', (req, res) => {
-  res.send("Hello world")
-})
+// Importar las rutas
+const encuentroRoutes = require('./routes/encuentroRoutes');
+const comentarioRoutes = require('./routes/comentarioRoutes');
+const parejaRoutes = require('./routes/parejaRoutes'); // Si tienes rutas para pareja
+const planRoutes = require('./routes/planRoutes'); // Si tienes rutas para plan
+const userRoutes = require('./routes/userRoutes'); // Si tienes rutas para usuario
 
-app.use(router)
+// Usar las rutas
+app.use('/api', encuentroRoutes);
+app.use('/api', comentarioRoutes);
+app.use('/api', parejaRoutes); // Si tienes rutas para pareja
+app.use('/api', planRoutes); // Si tienes rutas para plan
+app.use('/api', userRoutes); // Si tienes rutas para usuario
+
+// Iniciar el servidor
 app.listen(port, () => {
-  console.log('Listen on ' + port)
-})
+  console.log(`Servidor corriendo en http://localhost:${port}`);
+});
