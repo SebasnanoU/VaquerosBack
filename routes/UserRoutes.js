@@ -1,33 +1,72 @@
 const express = require('express');
 const router = express.Router();
-const UserModel = require('./models/UserModel');
-const userModel = new UserModel();
+const notion = require('../utils/notion');
 
-router.post('/user', async (req, res) => {
-  const userData = {
-    nombre: req.body.nombre,
-    apellido: req.body.apellido,
-    correo: req.body.correo,
-    foto: req.body.foto,
-    esAdmin: req.body.esAdmin,
-    grupos: req.body.grupos,
-  };
 
+// GET Todos los usuarios
+router.get('/', async (req, res) => {
   try {
-    const result = await userModel.createUser(userData);
-    res.send(result);
-  } catch (err) {
-    res.status(500).send({ status: 'error', message: 'Error almacenando la información' });
+    const response = await notion.databases.query({
+      database_id: process.env.NOTION_DATABASE_ID_USER,
+    });
+
+    const usuarios = await Promise.all(response.results.map(async page => {
+      const props = page.properties;
+
+      // Extraer IDs de pareja
+      const parejaIds = props['👗 Pareja']?.relation?.map(p => p.id) || [];
+
+      // Obtener datos de cada pareja
+      const parejasData = await Promise.all(parejaIds.map(async (id) => {
+        try {
+          const parejaPage = await notion.pages.retrieve({ page_id: id });
+          const parejaProps = parejaPage.properties;
+
+          return {
+            id,
+            nombre: parejaProps.nombre?.title?.[0]?.plain_text || '',
+            apellido: parejaProps.apellido?.rich_text?.[0]?.plain_text || '',
+            apodo: parejaProps.apodo?.rich_text?.[0]?.plain_text || '',
+          };
+        } catch (e) {
+          console.warn(`No se pudo traer pareja con ID ${id}`, e.message);
+          return null;
+        }
+      }));
+
+      return {
+        id: page.id,
+        nombre: props.nombre?.title?.[0]?.plain_text || '',
+        apellido: props.apellido?.rich_text?.[0]?.plain_text || '',
+        grupos: props.grupos?.multi_select?.map(g => g.name) || [],
+        foto: props.foto?.files?.[0]?.file?.url || '',
+        plan: props.plan?.relation?.map(p => p.id) || [],
+        parejas: parejasData.filter(p => p !== null),
+        esAdmin: props.esAdmin?.checkbox || false,
+        correo: props.correo?.email || ''
+      };
+    }));
+
+    res.json(usuarios);
+  } catch (error) {
+    console.error('Error al consultar la base de datos:', error);
+    res.status(500).json({ error: 'Error al consultar la base de datos' });
   }
 });
 
-router.get('/user', async (req, res) => {
+
+/*
+router.get('/', async (req, res) => {
   try {
-    const users = await userModel.getUsers();
-    res.json(users);
-  } catch (err) {
-    res.status(500).send({ status: 'error', message: 'Error obteniendo los usuarios' });
+    const response = await notion.databases.query({
+      database_id: process.env.NOTION_DATABASE_ID_USER,
+    });
+    res.json(response.results);
+  }
+  catch (error) {
+    console.error('Error al consultar la base de datos:', error);
+    res.status(500).json({ error: 'Error al consultar la base de datos' });
   }
 });
-
+*/
 module.exports = router;
