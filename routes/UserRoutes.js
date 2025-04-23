@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const notion = require('../utils/notion');
+const { updatePage } = require('@notionhq/client/build/src/api-endpoints');
 
 
+// /*
 // GET Todos los usuarios
 router.get('/', async (req, res) => {
   try {
@@ -53,7 +55,66 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Error al consultar la base de datos' });
   }
 });
+// */
 
+// POST Crear nuevo usuario
+router.post('/', async (req, res) => {
+  const { nombre, apellido, correo, esAdmin, parejaIds, grupos, plan, foto } = req.body;
+
+  try {
+    const newUser = await notion.pages.create({
+      parent: {
+        database_id: process.env.NOTION_DATABASE_ID_USER,
+      },
+      properties: {
+        nombre: {
+          title: [
+            {
+              text: { content: nombre }
+            }
+          ]
+        },
+        apellido: {
+          rich_text: [
+            {
+              text: { content: apellido }
+            }
+          ]
+        },
+        correo: {
+          email: correo
+        },
+        esAdmin: {
+          checkbox: esAdmin || false
+        },
+        '👗 Pareja': {
+          relation: Array.isArray(parejaIds) ? parejaIds.map(id => ({ id })) : []
+        },
+        grupos: {
+          multi_select: Array.isArray(grupos) ? grupos.map(g => ({ name: g })) : []
+        },
+        plan: {
+          relation: Array.isArray(plan) ? plan.map(id => ({ id })) : []
+        },
+        foto: {
+          files: fotoUrl
+            ? [{
+              name: 'foto_google.jpg',
+              type: 'external',
+              external: { url: fotoUrl }
+            }]
+            : []
+        }
+
+      }
+    });
+
+    res.status(201).json({ message: 'Usuario creado', id: newUser.id });
+  } catch (error) {
+    console.error('Error al crear el usuario:', error);
+    res.status(500).json({ error: 'Error al crear el usuario' });
+  }
+});
 
 /*
 router.get('/', async (req, res) => {
