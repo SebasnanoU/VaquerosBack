@@ -17,8 +17,7 @@ router.get('/', async (req, res) => {
         apellido: props.apellido?.rich_text?.[0]?.plain_text || '',
         apodo: props.apodo?.rich_text?.[0]?.plain_text || '',
         usuariosAsociados: props.usuariosAsociados?.relation?.map(r => r.id) || [],
-        encuentro: props.Encuentro?.relation?.map(r => r.id) || [],
-        url: page.url
+        encuentro: props.Encuentro?.relation?.map(r => r.id) || []
       };
     });
 
