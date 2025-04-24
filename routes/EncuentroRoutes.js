@@ -1,37 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const EncuentroModel = require('../models/EncuentroModel');
-const encuentroModel = new EncuentroModel();
+const notion = require('../utils/notion');
 
-router.post('/encuentro', async (req, res) => {
-  const encuentroData = {
-    fechaInicio: req.body.fechaInicio,
-    fechaFin: req.body.fechaFin,
-    calificacion: req.body.calificacion,
-    repetiria: req.body.repetiria,
-    memorable: req.body.memorable,
-    comentario: req.body.comentario,
-    latitud: req.body.latitud,
-    longitud: req.body.longitud,
-    plan: req.body.plan,
-    pareja: req.body.pareja,
-    usuario: req.body.usuario,
-  };
-
+router.get('/', async (req, res) => {
   try {
-    const result = await encuentroModel.createEncuentro(encuentroData);
-    res.send(result);
-  } catch (err) {
-    res.status(500).send({ status: 'error', message: 'Error almacenando la información' });
+    const response = await notion.databases.query({
+      database_id: process.env.NOTION_DATABASE_ID_ENCUENTRO,
+    });
+    res.json(response.results);
   }
-});
-
-router.get('/encuentro', async (req, res) => {
-  try {
-    const encuentros = await encuentroModel.getEncuentros();
-    res.json(encuentros);
-  } catch (err) {
-    res.status(500).send({ status: 'error', message: 'Error obteniendo los encuentros' });
+  catch (error) {
+    console.error('Error al consultar la base de datos:', error);
+    res.status(500).json({ error: 'Error al consultar la base de datos' });
   }
 });
 
