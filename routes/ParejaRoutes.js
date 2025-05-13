@@ -60,4 +60,111 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.post('/', async (req, res) => {
+  const { nombre, apellido, apodo, usuariosAsociados, encuentro } = req.body;
+
+  try {
+    const nuevaPareja = await notion.pages.create({
+      parent: {
+        database_id: process.env.NOTION_DATABASE_ID_PAREJA,
+      },
+      properties: {
+        nombre: {
+          title: [
+            {
+              text: { content: nombre }
+            }
+          ]
+        },
+        apellido: {
+          rich_text: [
+            {
+              text: { content: apellido }
+            }
+          ]
+        },
+        apodo: {
+          rich_text: [
+            {
+              text: { content: apodo || '' }
+            }
+          ]
+        },
+        usuariosAsociados: {
+          relation: Array.isArray(usuariosAsociados)
+            ? usuariosAsociados.map(id => ({ id }))
+            : []
+        },
+        Encuentro: {
+          relation: Array.isArray(encuentro)
+            ? encuentro.map(id => ({ id }))
+            : []
+        }
+      }
+    });
+
+    res.status(201).json({ message: 'Pareja creada', id: nuevaPareja.id });
+  } catch (error) {
+    console.error('Error al crear la pareja:', error);
+    res.status(500).json({ error: 'Error al crear la pareja' });
+  }
+});
+
+
+router.patch('/:id', async (req, res) => {
+  const { id } = req.params;
+  const {
+    nombre,
+    apellido,
+    apodo,
+    usuariosAsociados,
+    encuentro
+  } = req.body;
+
+  try {
+    const properties = {};
+
+    if (nombre !== undefined) {
+      properties.nombre = {
+        title: [{ text: { content: nombre } }]
+      };
+    }
+
+    if (apellido !== undefined) {
+      properties.apellido = {
+        rich_text: [{ text: { content: apellido } }]
+      };
+    }
+
+    if (apodo !== undefined) {
+      properties.apodo = {
+        rich_text: [{ text: { content: apodo || '' } }]
+      };
+    }
+
+    if (Array.isArray(usuariosAsociados)) {
+      properties.usuariosAsociados = {
+        relation: usuariosAsociados.map(id => ({ id }))
+      };
+    }
+
+    if (Array.isArray(encuentro)) {
+      properties.Encuentro = {
+        relation: encuentro.map(id => ({ id }))
+      };
+    }
+
+    const updatedPage = await notion.pages.update({
+      page_id: id,
+      properties
+    });
+
+    res.json({ message: 'Pareja actualizada', id: updatedPage.id });
+  } catch (error) {
+    console.error('Error al actualizar la pareja:', error);
+    res.status(500).json({ error: 'Error al actualizar la pareja' });
+  }
+});
+
+
 module.exports = router;
