@@ -60,3 +60,16 @@ Notas y posibles mejoras
 - Autenticación Google: validar imports y exposición de rutas (puede requerir montar `AuthRoutes` en `index.js`).
 - Propiedad `fotoUrl` en `routes/UserRoutes.js` no está definida; revisar antes de usar ese campo en creación de usuario.
 - Completar ejemplos y componentes del `openapi.yaml` a medida que evolucionen los modelos en Notion.
+
+Cloudflare Workers
+- No subas `wrangler.toml` al repositorio.
+- Usa el ejemplo `wrangler.example.toml`, cópialo y completa valores locales:
+  - `cp wrangler.example.toml wrangler.toml`
+  - Completa los IDs de Notion y `GOOGLE_CLIENT_ID`.
+- Secretos (no en el archivo):
+  - `wrangler secret put NOTION_API_KEY`
+  - `wrangler secret put JWT_SECRET`
+- Desarrollo local:
+  - `npm install`
+  - `npx wrangler dev`
+  - Abre `http://localhost:8787/docs`

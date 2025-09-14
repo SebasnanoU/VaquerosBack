@@ -23,6 +23,7 @@ dist-ssr
 *.local
 .env
 .env.*
+!.env.example
 
 # Editor directories and files
 .vscode/*
@@ -36,3 +37,7 @@ dist-ssr
 *.sw?
 .env
 .devcontainer
+.wrangler/
+wrangler.toml
+wrangler.*.toml
+!wrangler.example.toml
