@@ -1,0 +1,20 @@
+## wrangler.example.toml — ejemplo de configuración para Cloudflare Workers
+## Copia este archivo a `wrangler.toml` y completa los valores.
+
+name = "vaquerosback-workers"
+main = "src/worker.ts"
+compatibility_date = "2025-01-01"
+
+[vars]
+# Valores no sensibles (pueden quedar en el archivo)
+NOTION_DATABASE_ID_USER = ""
+NOTION_DATABASE_ID_PAREJA = ""
+NOTION_DATABASE_ID_ENCUENTRO = ""
+NOTION_DATABASE_ID_PLAN = ""
+NOTION_DATABASE_ID_COMENTARIOS = ""
+GOOGLE_CLIENT_ID = ""
+
+## Secretos: no los pongas en wrangler.toml real
+## Configúralos con:
+##   wrangler secret put NOTION_API_KEY
+##   wrangler secret put JWT_SECRET

@@ -36,3 +36,7 @@ dist-ssr
 *.sw?
 .env
 .devcontainer
+.wrangler/
+wrangler.toml
+wrangler.*.toml
+!wrangler.example.toml
