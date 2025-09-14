@@ -1,0 +1,210 @@
+openapi: 3.0.3
+info:
+  title: VaquerosBack API
+  version: 1.0.0
+  description: |
+    API Express para gestionar usuarios, parejas, encuentros, planes y comentarios.
+    
+    - Documentación interactiva disponible en `/docs` cuando el servidor está en ejecución.
+servers:
+  - url: http://localhost:3000
+    description: Servidor local
+tags:
+  - name: Users
+  - name: Pareja
+  - name: Encuentro
+  - name: Plan
+  - name: Comentarios
+
+paths:
+  /users:
+    get:
+      tags: [Users]
+      summary: Listar usuarios
+      responses:
+        '200':
+          description: Lista de usuarios
+    post:
+      tags: [Users]
+      summary: Crear usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre: { type: string }
+                apellido: { type: string }
+                correo: { type: string }
+                esAdmin: { type: boolean }
+                parejaIds:
+                  type: array
+                  items: { type: string }
+                grupos:
+                  type: array
+                  items: { type: string }
+                plan:
+                  type: array
+                  items: { type: string }
+                foto:
+                  type: string
+      responses:
+        '201': { description: Usuario creado }
+
+  /pareja:
+    get:
+      tags: [Pareja]
+      summary: Listar parejas
+      responses:
+        '200': { description: Lista de parejas }
+    post:
+      tags: [Pareja]
+      summary: Crear pareja
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre: { type: string }
+                apellido: { type: string }
+                apodo: { type: string }
+                usuariosAsociados:
+                  type: array
+                  items: { type: string }
+                encuentro:
+                  type: array
+                  items: { type: string }
+      responses:
+        '201': { description: Pareja creada }
+  /pareja/{id}:
+    patch:
+      tags: [Pareja]
+      summary: Actualizar pareja
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200': { description: Pareja actualizada }
+
+  /encuentro:
+    get:
+      tags: [Encuentro]
+      summary: Listar encuentros
+      responses:
+        '200': { description: Lista de encuentros }
+    post:
+      tags: [Encuentro]
+      summary: Crear encuentro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comentario: { type: string }
+                fechaInicio: { type: string, format: date-time }
+                fechaFin: { type: string, format: date-time }
+                calificacion: { type: number }
+                repetiria: { type: boolean }
+                memorable: { type: boolean }
+                latitud: { type: number }
+                longitud: { type: number }
+                iniciativa: { type: string }
+                pareja:
+                  type: array
+                  items: { type: string }
+                plan:
+                  type: array
+                  items: { type: string }
+                usuario:
+                  type: array
+                  items: { type: string }
+      responses:
+        '201': { description: Encuentro creado }
+  /encuentro/{id}:
+    patch:
+      tags: [Encuentro]
+      summary: Actualizar encuentro
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200': { description: Encuentro actualizado }
+
+  /plan:
+    get:
+      tags: [Plan]
+      summary: Listar planes
+      responses:
+        '200': { description: Lista de planes }
+    post:
+      tags: [Plan]
+      summary: Crear plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                detalles: { type: string }
+                tipoPlan: { type: string }
+                fechaHora: { type: string, format: date-time }
+                latitud: { type: number }
+                longitud: { type: number }
+                usuarios:
+                  type: array
+                  items: { type: string }
+                pareja:
+                  type: array
+                  items: { type: string }
+                encuentros:
+                  type: array
+                  items: { type: string }
+      responses:
+        '201': { description: Plan creado }
+  /plan/{id}:
+    patch:
+      tags: [Plan]
+      summary: Actualizar plan
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200': { description: Plan actualizado }
+
+  /comentarios:
+    get:
+      tags: [Comentarios]
+      summary: Listar comentarios
+      responses:
+        '200': { description: Lista de comentarios }
+
